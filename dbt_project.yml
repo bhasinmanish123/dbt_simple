@@ -1,0 +1,25 @@
+# ============================================================
+# dbt_simple — a minimal dbt project
+# 1 seed (table) + 1 view model
+# ============================================================
+name: 'dbt_simple'
+version: '1.0.0'
+
+# Which profile (connection) to use from profiles.yml
+profile: 'dbt_simple'
+
+# Where dbt looks for each type of file
+model-paths: ["models"]
+seed-paths: ["seeds"]
+
+# Where dbt writes compiled output (ignored by git)
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# ---- Model settings ----
+# All models in the "models" folder are built as VIEWS by default
+models:
+  dbt_simple:
+    +materialized: view

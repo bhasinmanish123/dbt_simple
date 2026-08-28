@@ -1,0 +1,31 @@
+# ============================================================
+# profiles.yml — tells dbt how to connect to Snowflake
+# Password/user come from environment variables (safe for git)
+# ============================================================
+dbt_simple:
+  target: dev          # default environment when you run "dbt build"
+  outputs:
+
+    # ---- DEV: your local practice environment ----
+    dev:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT', 'ixxaxho-kv48866') }}"
+      user: "{{ env_var('SNOWFLAKE_USER', 'admin') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD', '') }}"
+      role: TRANSFORM
+      database: AIRBNB
+      warehouse: COMPUTE_WH
+      schema: DEV
+      threads: 4
+
+    # ---- PROD: production environment (deploy on merge) ----
+    prod:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT', 'ixxaxho-kv48866') }}"
+      user: "{{ env_var('SNOWFLAKE_USER', 'admin') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD', '') }}"
+      role: TRANSFORM
+      database: AIRBNB
+      warehouse: COMPUTE_WH
+      schema: PROD
+      threads: 4

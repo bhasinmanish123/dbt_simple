@@ -1,0 +1,15 @@
+# dbt build output (auto-generated — not needed in git)
+target/
+dbt_packages/
+logs/
+
+# dbt fusion / core internal
+.dbt/
+.user.yml
+
+# secrets — never commit these
+.env
+*.env
+
+# OS junk
+.DS_Store

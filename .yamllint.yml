@@ -1,0 +1,11 @@
+# YAML linting rules — relaxed for dbt
+extends: default
+
+rules:
+  line-length:
+    max: 250
+    level: warning
+  indentation: disable
+  trailing-spaces: disable
+  new-line-at-end-of-file: disable
+  document-start: disable

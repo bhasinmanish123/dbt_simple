@@ -1,0 +1,33 @@
+# ============================================================
+# CD — runs when code is MERGED into main
+# Actually BUILDS the seed + view into Snowflake PROD schema.
+# ============================================================
+name: CD (Deploy to Prod)
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: dbt build to PROD
+    runs-on: ubuntu-latest
+    env:
+      DBT_PROFILES_DIR: .
+      SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+      SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+      SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dbt
+        run: pip install dbt-snowflake
+
+      - name: dbt build (PROD)
+        run: dbt build --target prod

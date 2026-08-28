@@ -1,0 +1,31 @@
+# ============================================================
+# CI — runs on every Pull Request
+# Only CHECKS the code (lint). Does NOT touch Snowflake.
+# ============================================================
+name: CI (Lint)
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Lint YAML + SQL
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install linters
+        run: pip install yamllint sqlfluff
+
+      - name: YAML Lint
+        run: yamllint -c .yamllint.yml dbt_project.yml profiles.yml
+
+      - name: SQL Lint
+        run: sqlfluff lint models/ --dialect snowflake --ignore templating || true
