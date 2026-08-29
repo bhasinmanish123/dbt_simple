@@ -1,0 +1,19 @@
+# ============================================================
+# docker-compose.yml — run dbt_simple with a short command
+#   docker compose run --rm dbt              (default: build dev)
+#   docker compose run --rm dbt bash run.sh prod
+# ============================================================
+services:
+  dbt:
+    build: .                      # build from the Dockerfile in this folder
+    image: dbt-simple
+    volumes:
+      - .:/dbt                    # mount live code — no rebuild on code changes
+    environment:
+      # Reads these from your shell (export them first) — keeps secrets out of the file
+      SNOWFLAKE_ACCOUNT: "${SNOWFLAKE_ACCOUNT}"
+      SNOWFLAKE_USER: "${SNOWFLAKE_USER}"
+      SNOWFLAKE_PASSWORD: "${SNOWFLAKE_PASSWORD}"
+      DBT_PROFILES_DIR: /dbt
+    # Default command if you don't pass one
+    command: ["bash", "run.sh", "dev"]
