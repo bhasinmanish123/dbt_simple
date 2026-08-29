@@ -1,0 +1,10 @@
+# Don't copy these into the Docker image
+target/
+dbt_packages/
+dbt_internal_packages/
+logs/
+.git/
+.github/
+.user.yml
+*.env
+.DS_Store
