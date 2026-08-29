@@ -1,0 +1,38 @@
+# ============================================================
+# CALLER — dbt_simple
+# Logic lives in the central dbt-actions repo.
+# This file only decides WHEN to run and passes secrets.
+#
+#   PR to main      -> stage: ci  (lint + build DEV)
+#   push/merge main -> stage: cd  (build PROD)
+# ============================================================
+name: dbt CI/CD
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  # ---- CI: on Pull Request ----
+  ci:
+    if: github.event_name == 'pull_request'
+    uses: bhasinmanish123/dbt-actions/.github/workflows/dbt-reusable.yml@main
+    with:
+      stage: ci
+    secrets:
+      SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+      SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+      SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+
+  # ---- CD: on push/merge to main ----
+  cd:
+    if: github.event_name == 'push'
+    uses: bhasinmanish123/dbt-actions/.github/workflows/dbt-reusable.yml@main
+    with:
+      stage: cd
+    secrets:
+      SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+      SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+      SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
