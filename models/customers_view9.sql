@@ -1,11 +1,13 @@
 -- ============================================================
 -- customers_view: a VIEW built on top of the customers seed
--- Simple columns first, calculated columns last (SQLFluff ST06)
+-- Combines first + last name and keeps key columns
 -- ============================================================
 
 select
     customer_id,
+    first_name || ' ' || last_name as full_name,
     city,
-    signup_date,
-    first_name || ' ' || last_name as full_name
+    signup_date
 from {{ ref('customers') }}
+-- test comment
+-- test comment
