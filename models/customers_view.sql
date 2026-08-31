@@ -13,3 +13,4 @@ from {{ ref('customers') }}
 -- fix token
 -- fix token
 -- wif fix
+-- wif fix
