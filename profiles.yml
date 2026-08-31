@@ -1,13 +1,13 @@
 # ============================================================
 # profiles.yml — Snowflake WIF (OIDC)
-# snowflake-actions@v3 sets SNOWFLAKE_TOKEN + SNOWFLAKE_WORKLOAD_IDENTITY_PROVIDER
-# dbt-snowflake needs token explicitly passed via env_var
+# Flow: ci (PR validate) → dev (on merge) → prod (on merge)
+# snowflake-actions@v3 sets SNOWFLAKE_TOKEN automatically
 # ============================================================
 dbt_simple:
   target: ci
   outputs:
 
-    # ---- CI: GitHub Actions PR builds ----
+    # ---- CI: PR validation (AIRBNB.CI) ----
     ci:
       type: snowflake
       account: "{{ env_var('SNOWFLAKE_ACCOUNT', 'ixxaxho-kv48866') }}"
@@ -21,7 +21,21 @@ dbt_simple:
       schema: CI
       threads: 4
 
-    # ---- PROD: GitHub Actions merge deploys ----
+    # ---- DEV: on merge to main (AIRBNB.DEV) ----
+    dev:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT', 'ixxaxho-kv48866') }}"
+      user: GITHUB_ACTIONS_SERVICE_USER
+      authenticator: workload_identity
+      workload_identity_provider: oidc
+      token: "{{ env_var('SNOWFLAKE_TOKEN', '') }}"
+      role: DBT_DEV_ROLE
+      database: AIRBNB
+      warehouse: COMPUTE_WH
+      schema: DEV
+      threads: 4
+
+    # ---- PROD: on merge to main (AIRBNB.PROD) ----
     prod:
       type: snowflake
       account: "{{ env_var('SNOWFLAKE_ACCOUNT', 'ixxaxho-kv48866') }}"
