@@ -1,29 +1,44 @@
 # ============================================================
-# profiles.yml — tells dbt how to connect to Snowflake
-# Password/user come from environment variables (safe for git)
+# profiles.yml — Snowflake connection (NO PASSWORDS)
+#   dev  : keypair auth (local laptop)
+#   ci   : OIDC oauth token (GitHub Actions)
+#   prod : keypair auth
 # ============================================================
 dbt_simple:
-  target: dev          # default environment when you run "dbt build"
+  target: dev
   outputs:
 
-    # ---- DEV: your local practice environment ----
+    # ---- DEV: local laptop — KEYPAIR auth (no password) ----
     dev:
       type: snowflake
       account: "{{ env_var('SNOWFLAKE_ACCOUNT', 'ixxaxho-kv48866') }}"
       user: "{{ env_var('SNOWFLAKE_USER', 'admin') }}"
-      password: "{{ env_var('SNOWFLAKE_PASSWORD', '') }}"
+      private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PATH', '~/.snowflake/rsa_key.p8') }}"
       role: TRANSFORM
       database: AIRBNB
       warehouse: COMPUTE_WH
       schema: DEV
       threads: 4
 
-    # ---- PROD: production environment (deploy on merge) ----
+    # ---- CI: GitHub Actions — OIDC OAUTH token (no password, no key) ----
+    ci:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT', 'ixxaxho-kv48866') }}"
+      user: "{{ env_var('SNOWFLAKE_USER', 'admin') }}"
+      authenticator: oauth
+      token: "{{ env_var('SNOWFLAKE_OAUTH_TOKEN', '') }}"
+      role: TRANSFORM
+      database: AIRBNB
+      warehouse: COMPUTE_WH
+      schema: CI
+      threads: 4
+
+    # ---- PROD: KEYPAIR auth (no password) ----
     prod:
       type: snowflake
       account: "{{ env_var('SNOWFLAKE_ACCOUNT', 'ixxaxho-kv48866') }}"
       user: "{{ env_var('SNOWFLAKE_USER', 'admin') }}"
-      password: "{{ env_var('SNOWFLAKE_PASSWORD', '') }}"
+      private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PATH', '~/.snowflake/rsa_key.p8') }}"
       role: TRANSFORM
       database: AIRBNB
       warehouse: COMPUTE_WH

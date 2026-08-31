@@ -1,10 +1,9 @@
 # ============================================================
 # CALLER — dbt_simple
-# Logic lives in the central dbt-actions repo.
-# This file only decides WHEN to run and passes secrets.
+# NO PASSWORDS — uses keypair (local) and OIDC (CI/CD)
 #
-#   PR to main      -> stage: ci  (lint + build DEV)
-#   push/merge main -> stage: cd  (build PROD)
+#   PR to main      -> stage: ci  (lint + build CI schema via OIDC)
+#   push/merge main -> stage: cd  (build PROD schema via OIDC)
 # ============================================================
 name: dbt CI/CD
 
@@ -24,7 +23,7 @@ jobs:
     secrets:
       SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
       SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
-      SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+      # NO SNOWFLAKE_PASSWORD — OIDC token fetched by reusable workflow
 
   # ---- CD: on push/merge to main ----
   cd:
@@ -35,4 +34,4 @@ jobs:
     secrets:
       SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
       SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
-      SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+      # NO SNOWFLAKE_PASSWORD — OIDC token fetched by reusable workflow
