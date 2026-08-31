@@ -9,3 +9,6 @@ select
     signup_date,
     first_name || ' ' || last_name as full_name
 from {{ ref('customers') }}
+-- OIDC test
+-- fix login name
+-- debug fix
