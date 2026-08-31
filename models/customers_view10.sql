@@ -9,5 +9,3 @@ select
     city,
     signup_date
 from {{ ref('customers') }}
--- test comment
--- test comment
