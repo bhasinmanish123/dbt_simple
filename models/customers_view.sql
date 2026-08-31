@@ -11,3 +11,4 @@ select
 from {{ ref('customers') }}
 -- OIDC test
 -- fix login name
+-- debug fix
