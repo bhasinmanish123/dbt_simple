@@ -11,3 +11,4 @@ select
 from {{ ref('customers') }}
 -- WIF test
 -- fix token
+-- fix token
