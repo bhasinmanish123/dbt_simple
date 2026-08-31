@@ -10,3 +10,4 @@ select
     first_name || ' ' || last_name as full_name
 from {{ ref('customers') }}
 -- test oidc auth
+-- test oidc auth
