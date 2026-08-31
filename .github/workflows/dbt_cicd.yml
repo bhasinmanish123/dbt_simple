@@ -1,9 +1,10 @@
 # ============================================================
 # CALLER — dbt_simple
-# NO PASSWORDS — uses keypair (local) and OIDC (CI/CD)
+# Uses Snowflake WIF (OIDC) — no passwords, no user secret
+# Only SNOWFLAKE_ACCOUNT needed as a secret
 #
-#   PR to main      -> stage: ci  (lint + build CI schema via OIDC)
-#   push/merge main -> stage: cd  (build PROD schema via OIDC)
+#   PR to main      -> stage: ci  (lint + build CI schema)
+#   push/merge main -> stage: cd  (build PROD schema)
 # ============================================================
 name: dbt CI/CD
 
@@ -13,7 +14,7 @@ on:
   push:
     branches: [main]
 
-# Required so the reusable workflow can fetch the GitHub OIDC token
+# Required for OIDC token request
 permissions:
   id-token: write
   contents: read
@@ -27,8 +28,6 @@ jobs:
       stage: ci
     secrets:
       SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-      SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
-      # NO SNOWFLAKE_PASSWORD — OIDC token fetched by reusable workflow
 
   # ---- CD: on push/merge to main ----
   cd:
@@ -38,5 +37,3 @@ jobs:
       stage: cd
     secrets:
       SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-      SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
-      # NO SNOWFLAKE_PASSWORD — OIDC token fetched by reusable workflow
