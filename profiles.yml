@@ -1,26 +1,28 @@
 # ============================================================
-# profiles.yml — Snowflake connection (NO PASSWORDS)
-#   dev  : keypair auth (local laptop)
-#   ci   : OIDC oauth token (GitHub Actions)
-#   prod : keypair auth
+# profiles.yml — Snowflake connection via OIDC only
+# NO keypair, NO password anywhere
+#   dev  : OIDC oauth token
+#   ci   : OIDC oauth token
+#   prod : OIDC oauth token
 # ============================================================
 dbt_simple:
-  target: dev
+  target: ci
   outputs:
 
-    # ---- DEV: local laptop — KEYPAIR auth (no password) ----
+    # ---- DEV: OIDC auth ----
     dev:
       type: snowflake
       account: "{{ env_var('SNOWFLAKE_ACCOUNT', 'ixxaxho-kv48866') }}"
       user: "{{ env_var('SNOWFLAKE_USER', 'admin') }}"
-      private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PATH', '~/.snowflake/rsa_key.p8') }}"
+      authenticator: oauth
+      token: "{{ env_var('SNOWFLAKE_OAUTH_TOKEN', '') }}"
       role: TRANSFORM
       database: AIRBNB
       warehouse: COMPUTE_WH
       schema: DEV
       threads: 4
 
-    # ---- CI: GitHub Actions — OIDC OAUTH token (no password, no key) ----
+    # ---- CI: OIDC auth (GitHub Actions PR) ----
     ci:
       type: snowflake
       account: "{{ env_var('SNOWFLAKE_ACCOUNT', 'ixxaxho-kv48866') }}"
@@ -33,12 +35,13 @@ dbt_simple:
       schema: CI
       threads: 4
 
-    # ---- PROD: KEYPAIR auth (no password) ----
+    # ---- PROD: OIDC auth (GitHub Actions merge) ----
     prod:
       type: snowflake
       account: "{{ env_var('SNOWFLAKE_ACCOUNT', 'ixxaxho-kv48866') }}"
       user: "{{ env_var('SNOWFLAKE_USER', 'admin') }}"
-      private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PATH', '~/.snowflake/rsa_key.p8') }}"
+      authenticator: oauth
+      token: "{{ env_var('SNOWFLAKE_OAUTH_TOKEN', '') }}"
       role: TRANSFORM
       database: AIRBNB
       warehouse: COMPUTE_WH
