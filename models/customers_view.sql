@@ -16,3 +16,4 @@ from {{ ref('customers') }}
 -- wif fix
 -- wif fix
 -- test ci dev prod
+-- test composite action setup-snowflake
