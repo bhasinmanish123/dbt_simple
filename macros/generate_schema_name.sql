@@ -3,42 +3,51 @@
     {#
         Generates schema name based on environment:
 
-        LOCAL DEV (target = dev):
-            Uses DBT_USER env var as prefix → DEV_MANISH, DEV_JOHN etc.
-            If DBT_USER not set → falls back to default schema from profiles.yml
-
         CI (target = ci):
-            Uses fixed schema CI (shared, for PR validation)
+            Uses GITHUB_ACTOR env var → DEV_MANISH, DEV_JOHN etc.
+            Each developer gets their own schema automatically.
+            Schema is created on the fly — no pre-creation needed.
+            If GITHUB_ACTOR not set → falls back to CI (safety net)
 
         PROD (target = prod):
-            Uses fixed schema PROD (no prefix — production is shared)
+            Uses fixed schema PROD — shared, no prefix.
+
+        DEV (target = dev):
+            Same as CI logic — uses GITHUB_ACTOR prefix.
+            Kept for flexibility if needed later.
     #}
 
     {%- set default_schema = target.schema -%}
 
-    {%- if target.name == 'dev' -%}
+    {%- if target.name == 'ci' -%}
 
-        {#- Get username from env var DBT_USER (set in local shell or CI) -#}
-        {%- set dbt_user = env_var('DBT_USER', '') -%}
+        {#- Get GitHub username from env var set in the workflow -#}
+        {%- set github_actor = env_var('GITHUB_ACTOR', '') -%}
 
-        {%- if dbt_user != '' -%}
-            {#- Personal dev schema: DEV_MANISH, DEV_JOHN etc. -#}
-            DEV_{{ dbt_user | upper | replace(' ', '_') }}
+        {%- if github_actor != '' -%}
+            {#- Personal CI schema: DEV_MANISH, DEV_JOHN etc. -#}
+            DEV_{{ github_actor | upper | replace('-', '_') | replace('.', '_') }}
         {%- else -%}
-            {#- Fallback to whatever schema is in profiles.yml -#}
+            {#- Fallback — shared CI schema -#}
             {{ default_schema }}
         {%- endif -%}
 
-    {%- elif target.name == 'ci' -%}
-        {#- CI is shared — just use CI schema from profiles.yml -#}
-        {{ default_schema }}
+    {%- elif target.name == 'dev' -%}
+
+        {#- Same logic as CI — developer personal schema -#}
+        {%- set github_actor = env_var('GITHUB_ACTOR', '') -%}
+
+        {%- if github_actor != '' -%}
+            DEV_{{ github_actor | upper | replace('-', '_') | replace('.', '_') }}
+        {%- else -%}
+            {{ default_schema }}
+        {%- endif -%}
 
     {%- elif target.name == 'prod' -%}
-        {#- PROD is shared — just use PROD schema from profiles.yml -#}
+        {#- PROD is always shared — no prefix -#}
         {{ default_schema }}
 
     {%- else -%}
-        {#- Any other target — use default -#}
         {{ default_schema }}
 
     {%- endif -%}
